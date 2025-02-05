@@ -57,6 +57,11 @@ def functionB_v5():
 
 # Update History
 
+## 0.0.3
+
+- Git Prefixを追加しました
+- GUI用のExampleとAssistantのExampleを分離するために, AssistantのExampleを移動させました
+
 ## 0.0.2
 
 - READMEにGitブランチ戦略について記述しました
