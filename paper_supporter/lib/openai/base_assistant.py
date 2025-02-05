@@ -95,3 +95,4 @@ class BaseAssistant:
                 event_handler=event_handler,
         ) as stream:
             stream.until_done()
+        return stream.current_message_snapshot.content[0].text.value
