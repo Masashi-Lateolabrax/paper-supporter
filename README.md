@@ -23,6 +23,13 @@
 
 # Update History
 
+## 0.0.2
+
+- READMEにGitブランチ戦略について記述しました
+- BaseFileAssistantを実装しました
+- BaseFileAssistantのexampleを実装しました
+
+
 ## 0.0.1
 
 - 基本となるBaseAssistantクラスを実装しました
