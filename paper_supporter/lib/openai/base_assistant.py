@@ -53,7 +53,7 @@ class BaseAssistant:
             thread_id=self.thread.id
         )
 
-    def modify(
+    def _modify(
             self,
             *,
             description: Optional[str] | NotGiven = NOT_GIVEN,

@@ -19,7 +19,7 @@ class BaseFileAssistant(BaseAssistant):
             ),
         )
 
-        super().modify(
+        self._modify(
             tools=[
                 FileSearchToolParam(
                     type="file_search",
@@ -53,6 +53,3 @@ class BaseFileAssistant(BaseAssistant):
             vector_store_id=self.vector_store.id,
             file_id=self.files[-1].id
         )
-
-    def modify(self, *args, **kwargs):
-        raise NotImplemented
