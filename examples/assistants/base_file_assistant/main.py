@@ -2,7 +2,7 @@ from paper_supporter.lib.openai import BaseFileAssistant, EventHandler
 
 
 def main():
-    assistant = BaseFileAssistant()
+    assistant = BaseFileAssistant("gpt-4o-mini")
     with open("./sample_file.md", "rb") as f:
         assistant.add_file(f)
 

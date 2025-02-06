@@ -7,8 +7,8 @@ from .base_assistant import CLIENT, BaseAssistant
 
 
 class BaseFileAssistant(BaseAssistant):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, model: str):
+        super().__init__(model)
         self.files: list[FileObject] = []
 
         self.vector_store = CLIENT.beta.vector_stores.create(

@@ -39,9 +39,9 @@ class EventHandler(AssistantEventHandler):
 
 
 class BaseAssistant:
-    def __init__(self):
+    def __init__(self, model: str):
         self.assistant = CLIENT.beta.assistants.create(
-            model="gpt-4o-mini",
+            model=model,
         )
         self.thread = CLIENT.beta.threads.create()
 
