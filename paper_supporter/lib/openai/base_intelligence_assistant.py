@@ -1,6 +1,7 @@
 from openai.types.beta import FileSearchToolParam, assistant_update_params
 from openai.types.beta.assistant_create_params import ToolResourcesFileSearch
 from openai.types.beta.file_search_tool_param import FileSearch
+from openai.types.beta.vector_stores import VectorStoreFile
 
 from .base_assistant import BaseAssistant, CLIENT
 
@@ -42,3 +43,23 @@ class BaseIntelligenceAssistant(BaseAssistant):
             vector_store_id=self.storage.id,
             file_id=file.id
         )
+
+    def get_files(self) -> list[VectorStoreFile]:
+        return CLIENT.beta.vector_stores.files.list(
+            vector_store_id=self.storage.id
+        )
+
+    def remove_file_from_vector_store(self, id_):
+        CLIENT.beta.vector_stores.files.delete(
+            vector_store_id=self.storage.id,
+            file_id=id_
+        )
+
+    @staticmethod
+    def remove_file_from_storage(id_):
+        CLIENT.files.delete(id_)
+
+    def remove_file(self, file: VectorStoreFile, remove_file_on_storage=True):
+        self.remove_file_from_vector_store(file.id)
+        if remove_file_on_storage:
+            BaseIntelligenceAssistant.remove_file_from_storage(file.id)
