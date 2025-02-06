@@ -1,3 +1,4 @@
+from openai import NOT_GIVEN
 from openai.types.beta import vector_store_create_params, assistant_update_params
 from openai.types.beta.assistant_update_params import ToolResourcesFileSearch
 from openai.types.beta.file_search_tool_param import FileSearchToolParam, FileSearch
@@ -7,7 +8,7 @@ from .base_assistant import CLIENT, BaseAssistant
 
 
 class BaseFileAssistant(BaseAssistant):
-    def __init__(self, model: str):
+    def __init__(self, model: str, instruction: str = NOT_GIVEN):
         super().__init__(model)
         self.files: list[FileObject] = []
 
@@ -29,7 +30,8 @@ class BaseFileAssistant(BaseAssistant):
                 file_search=ToolResourcesFileSearch(
                     vector_store_ids=[self.vector_store.id]
                 )
-            )
+            ),
+            instructions=instruction
         )
 
     def __del__(self):
