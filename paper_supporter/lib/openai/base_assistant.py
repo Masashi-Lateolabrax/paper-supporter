@@ -96,3 +96,11 @@ class BaseAssistant:
         ) as stream:
             stream.until_done()
         return stream.current_message_snapshot.content[0].text.value
+
+    def clear_messages(self):
+        thread_messages = CLIENT.beta.threads.messages.list(self.thread.id)
+        for msg in thread_messages:
+            CLIENT.beta.threads.messages.delete(
+                message_id=msg.id,
+                thread_id=self.thread.id,
+            )
