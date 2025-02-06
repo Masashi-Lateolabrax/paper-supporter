@@ -104,3 +104,9 @@ class BaseAssistant:
                 message_id=msg.id,
                 thread_id=self.thread.id,
             )
+
+    def set_instructions(self, instructions: str):
+        CLIENT.beta.assistants.update(
+            assistant_id=self.assistant.id,
+            instructions=instructions,
+        )
