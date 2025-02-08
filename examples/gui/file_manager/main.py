@@ -7,7 +7,7 @@ from paper_supporter.lib.openai.file_manager import FileManager
 
 from concurrent.futures import ThreadPoolExecutor
 
-from paper_supporter.env import ASSISTANT_VECTOR_STORE_ID
+from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
 
 from vector_store_manager import VectorStoreManager
 from storage_manager import StorageManager

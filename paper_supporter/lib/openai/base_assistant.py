@@ -1,18 +1,12 @@
 from typing_extensions import override
 from typing import Optional, Iterable
 
-from openai import OpenAI, NotGiven, NOT_GIVEN, AssistantEventHandler
+from openai import NotGiven, NOT_GIVEN, AssistantEventHandler
 from openai.types import Metadata
 from openai.types.beta import AssistantResponseFormatOptionParam, assistant_update_params
 from openai.types.beta.assistant_tool_param import AssistantToolParam
 
-from paper_supporter.env import ORGANIZATION, PROJECT, OPENAI_API_KEY
-
-CLIENT = OpenAI(
-    organization=ORGANIZATION,
-    project=PROJECT,
-    api_key=OPENAI_API_KEY
-)
+from paper_supporter.prerude import CLIENT
 
 
 class EventHandler(AssistantEventHandler):

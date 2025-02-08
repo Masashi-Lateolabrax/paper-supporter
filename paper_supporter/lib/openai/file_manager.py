@@ -1,11 +1,10 @@
-import dataclasses
 import time
 
 from openai.types import FileObject
 from openai.types.beta import VectorStore
 from openai.types.beta.vector_stores import VectorStoreFile
 
-from .base_assistant import CLIENT
+from paper_supporter.prerude import CLIENT
 
 
 class FileManager:

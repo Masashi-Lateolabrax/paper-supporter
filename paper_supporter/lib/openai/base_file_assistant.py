@@ -1,8 +1,9 @@
 from openai import NOT_GIVEN
 from openai.types.beta import vector_store_create_params
 
-from .base_assistant import CLIENT
 from .base_intelligence_assistant import BaseIntelligenceAssistant
+
+from paper_supporter.prerude import CLIENT
 
 
 class BaseFileAssistant(BaseIntelligenceAssistant):
