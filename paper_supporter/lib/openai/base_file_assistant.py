@@ -14,7 +14,7 @@ class BaseFileAssistant(BaseIntelligenceAssistant):
             ),
         )
 
-        super().__init__(model, storage_id=self.vector_store.id)
+        super().__init__(model, vector_store_id=self.vector_store.id)
         self.set_instructions(instruction)
 
     def __del__(self):
