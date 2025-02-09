@@ -1,11 +1,13 @@
 import markdown
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel
 from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
 from paper_supporter.src.chat.assistant_worker import AssistantWorker
 
 
 class ChatWidget(QWidget):
+    user_message = Signal(str)  # Define the signal
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Chat Application")
@@ -18,6 +20,7 @@ class ChatWidget(QWidget):
         vector_store_id = ASSISTANT_VECTOR_STORE_ID.get()
         self.worker = AssistantWorker("gpt-4o-mini", vector_store_id)
         self.worker.assistant_reply.connect(self.on_finished)
+        self.user_message.connect(self.worker.receive_message)
         self.worker.start()
 
     def _initialize_ui(self):
@@ -44,12 +47,14 @@ class ChatWidget(QWidget):
         if user_message:
             self.chat_display.append(f"<b>User:</b> {user_message}")
             self.message_input.clear()
-            self.worker.exec(user_message)
+            self.send_button.setEnabled(False)
+            self.user_message.emit(user_message)  # Emit the signal
             self.loading_label.setVisible(True)
 
     @Slot(str)
     def on_finished(self, response: str):
         self.loading_label.setVisible(False)
+        self.send_button.setEnabled(True)
         html_response = markdown.markdown(response)
         self.chat_display.append(f"<b>Assistant:</b> {html_response}")
 

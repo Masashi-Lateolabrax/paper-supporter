@@ -2,12 +2,10 @@ import enum
 from PySide6.QtCore import Signal, Slot, QMutex, QThread, QMutexLocker
 from .base_assistant_wrapper import ChatAssistant
 
-
 class AssistantWorkerState(enum.Enum):
     Idle = enum.auto()
     Processing = enum.auto()
     NeedExecution = enum.auto()
-
 
 class AssistantWorker(QThread):
     assistant_reply = Signal(str)
@@ -30,7 +28,7 @@ class AssistantWorker(QThread):
             print(f"Exception in _cleanup: {e}")
 
     @Slot(str)
-    def exec(self, message: str):
+    def receive_message(self, message: str):
         with QMutexLocker(self.mutex):
             if self.state == AssistantWorkerState.Idle:
                 self.state = AssistantWorkerState.NeedExecution
