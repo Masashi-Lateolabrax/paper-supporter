@@ -111,3 +111,12 @@ class BaseIntelligenceAssistant(BaseAssistant):
         self.remove_file_from_vector_store(file.id)
         if remove_file_on_storage:
             BaseIntelligenceAssistant.remove_file_from_storage(file.id)
+
+    def stream(self):
+        """
+        Stream the assistant messages.
+
+        :return: A generator of assistant messages.
+        """
+
+        return super().stream()
