@@ -20,7 +20,9 @@ class MainWindow(QMainWindow):
 
     def _initialize_windows(self):
         self.chat_widget = ChatWidget()
+
         self.file_widget = FileWidget()
+        self.file_widget.setFixedWidth(300)
 
         self.main_layout.addWidget(self.chat_widget)
         self.main_layout.addWidget(self.file_widget)
