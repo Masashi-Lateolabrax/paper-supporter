@@ -1,1 +1,1 @@
-from .file_window import FileWidget
+from .file_widget import FileWidget

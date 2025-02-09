@@ -1,1 +1,1 @@
-from .chat_window import ChatWidget
+from .chat_widget import ChatWidget
