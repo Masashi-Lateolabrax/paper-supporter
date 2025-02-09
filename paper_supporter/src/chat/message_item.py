@@ -14,7 +14,7 @@ class UserMessageItem(QListWidgetItem):
         self.adjust_height(width)
 
     def _set_message(self, message: str):
-        self.text_edit.setHtml(f'<div style="border: 2px solid blue; padding: 5px;">{message}</div>')
+        self.text_edit.setHtml(f'<div style="padding: 5px;">User: <br> {message}</div>')
 
     def adjust_height(self, width=None):
         if width is None:
@@ -40,7 +40,7 @@ class ProgressedMessageItem(QListWidgetItem):
         self.set_message(html_message)
 
     def set_message(self, html_message: str):
-        self.label.setText(f'<div style="border: 2px solid green; padding: 5px;">{html_message}</div>')
+        self.label.setText(f'<div style="padding: 5px;">Assistant: <br> {html_message}</div>')
         self._adjust_height()
 
     def _adjust_height(self):
@@ -60,7 +60,7 @@ class AssistantMessageItem(QListWidgetItem):
         self.adjust_height(width)
 
     def _set_message(self, html_message: str):
-        self.text_edit.setHtml(f'<div style="border: 2px solid green; padding: 5px;">{html_message}</div>')
+        self.text_edit.setHtml(html_message)
 
     def adjust_height(self, width=None):
         if width is None:
