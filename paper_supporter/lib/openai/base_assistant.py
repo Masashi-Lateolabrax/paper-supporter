@@ -5,6 +5,7 @@ from openai import NotGiven, NOT_GIVEN, AssistantEventHandler
 from openai.types import Metadata
 from openai.types.beta import AssistantResponseFormatOptionParam, assistant_update_params
 from openai.types.beta.assistant_tool_param import AssistantToolParam
+from openai.lib.streaming import AssistantStreamManager
 
 from paper_supporter.prerude import CLIENT
 
@@ -131,6 +132,15 @@ class BaseAssistant:
         ) as stream:
             stream.until_done()
         return stream.current_message_snapshot.content[0].text.value
+
+    def stream(self) -> AssistantStreamManager:
+        """
+        Start the assistant and generate responses based on the conversation.
+        """
+        return CLIENT.beta.threads.runs.stream(
+            thread_id=self.thread.id,
+            assistant_id=self.assistant.id,
+        )
 
     def clear_messages(self):
         """
