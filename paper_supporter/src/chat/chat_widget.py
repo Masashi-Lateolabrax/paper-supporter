@@ -1,12 +1,23 @@
+from enum import Enum
+
 import markdown
+
 from PySide6.QtCore import Qt, Signal, Slot
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel, QListWidget
+
 from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
-from paper_supporter.src.chat.assistant_worker import AssistantWorker
+
+from .assistant_worker import AssistantWorker
+from .message_item import UserMessageItem, AssistantMessageItem
+
+
+class SenderType(Enum):
+    USER = 1
+    ASSISTANT = 2
 
 
 class ChatWidget(QWidget):
-    user_message = Signal(str)  # Define the signal
+    user_message = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -24,8 +35,7 @@ class ChatWidget(QWidget):
         self.worker.start()
 
     def _initialize_ui(self):
-        self.chat_display = QTextEdit(self)
-        self.chat_display.setReadOnly(True)
+        self.chat_display = QListWidget(self)
         self.layout.addWidget(self.chat_display)
 
         self.message_input = QTextEdit(self)
@@ -45,10 +55,10 @@ class ChatWidget(QWidget):
     def send_message(self):
         user_message = self.message_input.toPlainText().strip()
         if user_message:
-            self.chat_display.append(f"<b>User:</b> {user_message}")
+            self.add_message(user_message, SenderType.USER)
             self.message_input.clear()
             self.send_button.setEnabled(False)
-            self.user_message.emit(user_message)  # Emit the signal
+            self.user_message.emit(user_message)
             self.loading_label.setVisible(True)
 
     @Slot(str)
@@ -56,7 +66,15 @@ class ChatWidget(QWidget):
         self.loading_label.setVisible(False)
         self.send_button.setEnabled(True)
         html_response = markdown.markdown(response)
-        self.chat_display.append(f"<b>Assistant:</b> {html_response}")
+        self.add_message(html_response, SenderType.ASSISTANT)
+
+    def add_message(self, message: str, sender: SenderType):
+        if sender == SenderType.USER:
+            item = UserMessageItem(message)
+        else:
+            item = AssistantMessageItem(message)
+        self.chat_display.addItem(item)
+        self.chat_display.setItemWidget(item, item.text_edit)
 
     def closeEvent(self, event):
         self.worker.requestInterruption()
