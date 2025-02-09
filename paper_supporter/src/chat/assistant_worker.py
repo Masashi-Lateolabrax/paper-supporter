@@ -1,18 +1,22 @@
 import enum
 from PySide6.QtCore import Signal, Slot, QMutex, QThread, QMutexLocker
-from .base_assistant_wrapper import ChatAssistant
+from openai.types.beta.assistant_stream_event import ThreadMessageDelta
+
+from paper_supporter.lib.openai import BaseIntelligenceAssistant
+
 
 class AssistantWorkerState(enum.Enum):
     Idle = enum.auto()
     Processing = enum.auto()
     NeedExecution = enum.auto()
 
+
 class AssistantWorker(QThread):
-    assistant_reply = Signal(str)
+    assistant_text_delta = Signal(str)
 
     def __init__(self, model: str, vector_store_id: str = None, parent=None):
         super().__init__(parent)
-        self.assistant = ChatAssistant(model, vector_store_id)
+        self.assistant = BaseIntelligenceAssistant(model, vector_store_id)
         self.mutex = QMutex()
         self.message = ""
         self.state = AssistantWorkerState.Idle
@@ -36,8 +40,14 @@ class AssistantWorker(QThread):
 
     def _process_messages(self, message: str):
         self.assistant.add_message(message)
-        response = self.assistant.run()
-        self.assistant_reply.emit(response)
+        debug = []
+        with self.assistant.stream() as stream:
+            for event in stream:
+                if isinstance(event, ThreadMessageDelta):
+                    delta = event.data.delta.content[0].text.value
+                    self.assistant_text_delta.emit(delta)
+                    debug.append(delta)
+        print(f"DEBUG: assistant> {debug}")
 
     def run(self):
         while not self.isInterruptionRequested():

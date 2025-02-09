@@ -1,6 +1,4 @@
-from enum import Enum
-
-import markdown
+import enum
 
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel, QListWidget
@@ -11,7 +9,7 @@ from .assistant_worker import AssistantWorker
 from .message_item import UserMessageItem, AssistantMessageItem
 
 
-class SenderType(Enum):
+class SenderType(enum.Enum):
     USER = 1
     ASSISTANT = 2
 
@@ -30,7 +28,7 @@ class ChatWidget(QWidget):
 
         vector_store_id = ASSISTANT_VECTOR_STORE_ID.get()
         self.worker = AssistantWorker("gpt-4o-mini", vector_store_id)
-        self.worker.assistant_reply.connect(self.on_finished)
+        self.worker.assistant_text_delta.connect(self.on_text_delta)
         self.user_message.connect(self.worker.receive_message)
         self.worker.start()
 
@@ -62,17 +60,22 @@ class ChatWidget(QWidget):
             self.loading_label.setVisible(True)
 
     @Slot(str)
-    def on_finished(self, response: str):
-        self.loading_label.setVisible(False)
-        self.send_button.setEnabled(True)
-        html_response = markdown.markdown(response)
-        self.add_message(html_response, SenderType.ASSISTANT)
+    def on_text_delta(self, delta: str):
+        last_item = self.chat_display.item(self.chat_display.count() - 1)
+        if isinstance(last_item, AssistantMessageItem):
+            last_item.append_delta(delta)
+            last_item.adjust_height()
+        else:
+            self.add_message(delta, SenderType.ASSISTANT)
+            self.loading_label.setVisible(False)
+            self.send_button.setEnabled(True)
 
     def add_message(self, message: str, sender: SenderType):
         if sender == SenderType.USER:
             item = UserMessageItem(message)
         else:
-            item = AssistantMessageItem(message)
+            item = AssistantMessageItem()
+            item.append_delta(message)
         self.chat_display.addItem(item)
         self.chat_display.setItemWidget(item, item.text_edit)
 
