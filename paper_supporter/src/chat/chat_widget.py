@@ -26,6 +26,7 @@ class ChatWidget(QWidget):
         self.layout.addWidget(self.chat_display)
 
         self.message_input = QTextEdit(self)
+        self.message_input.setFixedHeight(150)
         self.layout.addWidget(self.message_input)
 
         self.send_button = QPushButton("Send", self)
