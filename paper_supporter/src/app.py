@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
 
-from .chat import ChatWindow
-from .file_manager import FileWindow
+from .chat import ChatWidget
+from .file_manager import FileWidget
 from ..prerude import ASSISTANT_VECTOR_STORE_ID
 
 
@@ -19,15 +19,15 @@ class MainWindow(QMainWindow):
         self._initialize_windows()
 
     def _initialize_windows(self):
-        self.chat_window = ChatWindow()
-        self.file_window = FileWindow()
+        self.chat_widget = ChatWidget()
+        self.file_widget = FileWidget()
 
-        self.main_layout.addWidget(self.chat_window.centralWidget())
-        self.main_layout.addWidget(self.file_window.centralWidget())
+        self.main_layout.addWidget(self.chat_widget)
+        self.main_layout.addWidget(self.file_widget)
 
     def closeEvent(self, event):
-        if self.chat_window.worker:
-            self.chat_window.worker.requestInterruption()
-            self.chat_window.worker.wait()
-        ASSISTANT_VECTOR_STORE_ID.set(self.file_window.vector_store_manager.vector_store_id)
+        if self.chat_widget.worker:
+            self.chat_widget.worker.requestInterruption()
+            self.chat_widget.worker.wait()
+        ASSISTANT_VECTOR_STORE_ID.set(self.file_widget.vector_store_manager.vector_store_id)
         event.accept()

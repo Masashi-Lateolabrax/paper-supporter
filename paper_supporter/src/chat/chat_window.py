@@ -1,20 +1,16 @@
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel
-
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel
 from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
 from paper_supporter.src.chat.assistant_worker import AssistantWorker
 
 
-class ChatWindow(QMainWindow):
+class ChatWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Chat Application")
         self.setGeometry(100, 100, 600, 400)
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-
-        self.layout = QVBoxLayout(self.central_widget)
+        self.layout = QVBoxLayout(self)
 
         self._initialize_ui()
 
@@ -44,7 +40,7 @@ class ChatWindow(QMainWindow):
     def send_message(self):
         user_message = self.message_input.toPlainText().strip()
         if user_message:
-            self.chat_display.append(f"User: {user_message}")
+            self.chat_display.append(f"<b>User:</b> {user_message}")
             self.message_input.clear()
             self.worker.exec(user_message)
             self.loading_label.setVisible(True)
