@@ -1,3 +1,4 @@
+import markdown
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel
 from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
@@ -48,7 +49,8 @@ class ChatWidget(QWidget):
     @Slot(str)
     def on_finished(self, response: str):
         self.loading_label.setVisible(False)
-        self.chat_display.append(f"Assistant: {response}")
+        html_response = markdown.markdown(response)
+        self.chat_display.append(f"<b>Assistant:</b> {html_response}")
 
     def closeEvent(self, event):
         self.worker.requestInterruption()
