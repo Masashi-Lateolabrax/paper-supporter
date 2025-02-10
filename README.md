@@ -2,6 +2,30 @@
 
 論文を読むためのサポートをChatGPTにさせる目的で作られたコードです.
 
+# Usage
+
+**step1**: OpenAIのAPIキーを取得します.
+
+**step2**: 環境変数を設定します.
+
+*.env* ファイルを作成し, そこに環境変数を設定します. 内容は*env-template*を参考にしてください.
+
+**step3**: ライブラリをインストールします.
+
+```bash
+poetry install # if you use poetry
+
+pip install -r requirements.txt # if you use pip
+```
+
+**step4**: プログラムを実行します.
+
+```bash
+poetry python main.py # if you use poetry
+
+python main.py # if you use pip
+```
+
 # Development
 
 ## Git Prefix
@@ -56,6 +80,10 @@ def functionB_v5():
 *README.md* は *develop* ブランチから *main* ブランチにマージしたいときに変更する.
 
 # Update History
+
+## 0.0.6
+
+- READMEにこのプロジェクトの使用方法を追加しました
 
 ## 0.0.5
 
