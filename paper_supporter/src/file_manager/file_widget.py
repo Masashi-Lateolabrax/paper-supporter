@@ -1,25 +1,25 @@
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QFileDialog
 
-from paper_supporter.lib.openai.file_manager import FileManager
 from concurrent.futures import ThreadPoolExecutor
 
 from .vector_store_manager import VectorStoreManager
 from .storage_manager import StorageManager
 
-from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
+from paper_supporter.lib.openai.file_manager import FileManager
+from paper_supporter.lib.utils import EnvVariable
 
 
 class FileWidget(QWidget):
-    def __init__(self):
+    def __init__(self, env_variable: EnvVariable):
         super().__init__()
         self.setWindowTitle("File Manager")
         self.setGeometry(100, 100, 800, 500)
 
         self.main_layout = QVBoxLayout(self)
 
-        vector_store_id = ASSISTANT_VECTOR_STORE_ID.get()
-        self.file_manager = FileManager(vector_store_id)
+        vector_store_id = env_variable.get_vector_store_id()
+        self.file_manager = FileManager(env_variable.CLIENT, vector_store_id)
         self.storage_manager = StorageManager(self.file_manager, self)
         self.vector_store_manager = VectorStoreManager(self.file_manager, self, vector_store_id)
 

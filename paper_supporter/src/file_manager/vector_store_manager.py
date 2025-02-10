@@ -1,6 +1,8 @@
 from openai.types import FileObject
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QListWidgetItem, QLabel, QListWidget, QPushButton, QHBoxLayout, QVBoxLayout, QWidget
+
 from paper_supporter.lib.openai.file_manager import FileManager
 
 

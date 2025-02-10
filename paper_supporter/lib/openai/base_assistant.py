@@ -1,13 +1,11 @@
 from typing_extensions import override
 from typing import Optional, Iterable
 
-from openai import NotGiven, NOT_GIVEN, AssistantEventHandler
+from openai import NotGiven, NOT_GIVEN, AssistantEventHandler, OpenAI
 from openai.types import Metadata
 from openai.types.beta import AssistantResponseFormatOptionParam, assistant_update_params
 from openai.types.beta.assistant_tool_param import AssistantToolParam
 from openai.lib.streaming import AssistantStreamManager
-
-from paper_supporter.prerude import CLIENT
 
 
 class EventHandler(AssistantEventHandler):
@@ -40,25 +38,26 @@ class BaseAssistant:
     BaseAssistant class to interact with the OpenAI assistant.
     """
 
-    def __init__(self, model: str):
+    def __init__(self, client: OpenAI, model: str):
         """
         Initialize the BaseAssistant with a specific model.
 
         :param model: The model to use for the assistant.
         """
-        self.assistant = CLIENT.beta.assistants.create(
+        self.client = client
+        self.assistant = client.beta.assistants.create(
             model=model,
         )
-        self.thread = CLIENT.beta.threads.create()
+        self.thread = client.beta.threads.create()
 
     def __del__(self):
         """
         Clean up the assistant and the conversation data when the object is deleted.
         """
-        CLIENT.beta.assistants.delete(
+        self.client.beta.assistants.delete(
             assistant_id=self.assistant.id
         )
-        CLIENT.beta.threads.delete(
+        self.client.beta.threads.delete(
             thread_id=self.thread.id
         )
 
@@ -91,7 +90,7 @@ class BaseAssistant:
         :param top_p: The top_p setting for the assistant.
         """
 
-        CLIENT.beta.assistants.update(
+        self.client.beta.assistants.update(
             assistant_id=self.assistant.id,
             description=description,
             instructions=instructions,
@@ -112,7 +111,7 @@ class BaseAssistant:
         :param message: The message to add.
         """
 
-        CLIENT.beta.threads.messages.create(
+        self.client.beta.threads.messages.create(
             thread_id=self.thread.id,
             role="user",
             content=message
@@ -125,7 +124,7 @@ class BaseAssistant:
         :param event_handler: The event handler to use for handling events.
         :return: The final response text from the assistant.
         """
-        with CLIENT.beta.threads.runs.stream(
+        with self.client.beta.threads.runs.stream(
                 thread_id=self.thread.id,
                 assistant_id=self.assistant.id,
                 event_handler=event_handler,
@@ -137,7 +136,7 @@ class BaseAssistant:
         """
         Start the assistant and generate responses based on the conversation.
         """
-        return CLIENT.beta.threads.runs.stream(
+        return self.client.beta.threads.runs.stream(
             thread_id=self.thread.id,
             assistant_id=self.assistant.id,
         )
@@ -146,9 +145,9 @@ class BaseAssistant:
         """
         Clear the conversation with the assistant.
         """
-        thread_messages = CLIENT.beta.threads.messages.list(self.thread.id)
+        thread_messages = self.client.beta.threads.messages.list(self.thread.id)
         for msg in thread_messages:
-            CLIENT.beta.threads.messages.delete(
+            self.client.beta.threads.messages.delete(
                 message_id=msg.id,
                 thread_id=self.thread.id,
             )
@@ -159,7 +158,7 @@ class BaseAssistant:
 
         :param instructions: The instructions to set.
         """
-        CLIENT.beta.assistants.update(
+        self.client.beta.assistants.update(
             assistant_id=self.assistant.id,
             instructions=instructions,
         )

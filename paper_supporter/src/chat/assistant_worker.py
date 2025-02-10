@@ -2,6 +2,7 @@ import enum
 
 import markdown
 from PySide6.QtCore import Signal, Slot, QMutex, QThread, QMutexLocker
+from openai import OpenAI
 from openai.types.beta.assistant_stream_event import ThreadMessageDelta
 
 from paper_supporter.lib.openai import BaseIntelligenceAssistant
@@ -17,9 +18,9 @@ class AssistantWorker(QThread):
     assistant_text_delta = Signal(str)
     message_complete = Signal()
 
-    def __init__(self, model: str, vector_store_id: str = None, parent=None):
+    def __init__(self, client: OpenAI, model: str, vector_store_id: str = None, parent=None):
         super().__init__(parent)
-        self.assistant = BaseIntelligenceAssistant(model, vector_store_id)
+        self.assistant = BaseIntelligenceAssistant(client, model, vector_store_id)
         self.mutex = QMutex()
         self.message = ""
         self.state = AssistantWorkerState.Idle

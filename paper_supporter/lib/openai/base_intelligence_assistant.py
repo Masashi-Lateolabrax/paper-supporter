@@ -1,9 +1,10 @@
+from openai import OpenAI
 from openai.types.beta import FileSearchToolParam, assistant_update_params
 from openai.types.beta.assistant_create_params import ToolResourcesFileSearch
 from openai.types.beta.file_search_tool_param import FileSearch
 from openai.types.beta.vector_stores import VectorStoreFile
 
-from .base_assistant import BaseAssistant, CLIENT
+from .base_assistant import BaseAssistant
 
 
 class BaseIntelligenceAssistant(BaseAssistant):
@@ -11,7 +12,7 @@ class BaseIntelligenceAssistant(BaseAssistant):
     BaseIntelligenceAssistant class to interact with the OpenAI assistant with additional file search capabilities.
     """
 
-    def __init__(self, model: str, vector_store_id: str = None):
+    def __init__(self, client: OpenAI, model: str, vector_store_id: str = None):
         """
         Initialize the BaseIntelligenceAssistant with a specific model and optional storage ID.
 
@@ -19,12 +20,12 @@ class BaseIntelligenceAssistant(BaseAssistant):
         :param vector_store_id: The storage ID for the vector store. If None, a new vector store is created.
         """
 
-        super().__init__(model)
+        super().__init__(client, model)
 
         if vector_store_id is None:
-            self.vector_store = CLIENT.beta.vector_stores.create()
+            self.vector_store = self.client.beta.vector_stores.create()
         else:
-            self.vector_store = CLIENT.beta.vector_stores.retrieve(
+            self.vector_store = self.client.beta.vector_stores.retrieve(
                 vector_store_id=vector_store_id
             )
 
@@ -58,11 +59,11 @@ class BaseIntelligenceAssistant(BaseAssistant):
         :param file_object: The file object to add.
         """
 
-        file = CLIENT.files.create(
+        file = self.client.files.create(
             file=file_object,
             purpose="assistants"
         )
-        CLIENT.beta.vector_stores.files.create(
+        self.client.beta.vector_stores.files.create(
             vector_store_id=self.vector_store.id,
             file_id=file.id
         )
@@ -74,7 +75,7 @@ class BaseIntelligenceAssistant(BaseAssistant):
         :return: A list of VectorStoreFile objects.
         """
 
-        return CLIENT.beta.vector_stores.files.list(
+        return self.client.beta.vector_stores.files.list(
             vector_store_id=self.vector_store.id
         )
 
@@ -85,20 +86,19 @@ class BaseIntelligenceAssistant(BaseAssistant):
         :param id_: The ID of the file to remove.
         """
 
-        CLIENT.beta.vector_stores.files.delete(
+        self.client.beta.vector_stores.files.delete(
             vector_store_id=self.vector_store.id,
             file_id=id_
         )
 
-    @staticmethod
-    def remove_file_from_storage(id_):
+    def remove_file_from_storage(self, id_):
         """
         Remove a file from the storage by its ID.
 
         :param id_: The ID of the file to remove.
         """
 
-        CLIENT.files.delete(id_)
+        self.client.files.delete(id_)
 
     def remove_file(self, file: VectorStoreFile, remove_file_on_storage=True):
         """
@@ -110,7 +110,7 @@ class BaseIntelligenceAssistant(BaseAssistant):
 
         self.remove_file_from_vector_store(file.id)
         if remove_file_on_storage:
-            BaseIntelligenceAssistant.remove_file_from_storage(file.id)
+            self.remove_file_from_storage(file.id)
 
     def stream(self):
         """

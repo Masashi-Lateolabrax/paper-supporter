@@ -3,7 +3,7 @@ import enum
 from PySide6.QtCore import Qt, Signal, Slot, QTimer
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QPushButton, QLabel, QListWidget, QAbstractItemView
 
-from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
+from paper_supporter.lib.utils import EnvVariable
 
 from .assistant_worker import AssistantWorker
 from .message_item import UserMessageItem, ProgressedMessageItem, AssistantMessageItem
@@ -17,7 +17,7 @@ class SenderType(enum.Enum):
 class ChatWidget(QWidget):
     user_message = Signal(str)
 
-    def __init__(self):
+    def __init__(self, env_variable: EnvVariable):
         super().__init__()
         self.setWindowTitle("Chat Application")
         self.setGeometry(100, 100, 600, 400)
@@ -25,8 +25,8 @@ class ChatWidget(QWidget):
         self.layout = QVBoxLayout(self)
         self._initialize_ui()
 
-        vector_store_id = ASSISTANT_VECTOR_STORE_ID.get()
-        self.worker = AssistantWorker("gpt-4o-mini", vector_store_id)
+        vector_store_id = env_variable.get_vector_store_id()
+        self.worker = AssistantWorker(env_variable.CLIENT, "gpt-4o-mini", vector_store_id)
         self.worker.assistant_text_delta.connect(self.on_html)
         self.worker.message_complete.connect(self.finalize_message)
         self.user_message.connect(self.worker.receive_message)

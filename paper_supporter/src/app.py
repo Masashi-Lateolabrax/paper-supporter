@@ -1,13 +1,16 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout
 
+from paper_supporter.lib.utils import EnvVariable
+
 from .chat import ChatWidget
 from .file_manager import FileWidget
-from ..prerude import ASSISTANT_VECTOR_STORE_ID
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, env_variable: EnvVariable):
         super().__init__()
+        self.env = env_variable
+
         self.setWindowTitle("Chat and File Manager")
         self.setGeometry(100, 100, 1200, 600)
 
@@ -19,9 +22,9 @@ class MainWindow(QMainWindow):
         self._initialize_windows()
 
     def _initialize_windows(self):
-        self.chat_widget = ChatWidget()
+        self.chat_widget = ChatWidget(self.env)
 
-        self.file_widget = FileWidget()
+        self.file_widget = FileWidget(self.env)
         self.file_widget.setFixedWidth(300)
 
         self.main_layout.addWidget(self.chat_widget)
@@ -31,5 +34,5 @@ class MainWindow(QMainWindow):
         if self.chat_widget.worker:
             self.chat_widget.worker.requestInterruption()
             self.chat_widget.worker.wait()
-        ASSISTANT_VECTOR_STORE_ID.set(self.file_widget.vector_store_manager.vector_store_id)
+        self.env.set_vector_store_id(self.file_widget.vector_store_manager.vector_store_id)
         event.accept()

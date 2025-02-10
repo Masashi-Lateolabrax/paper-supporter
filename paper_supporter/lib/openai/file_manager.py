@@ -1,10 +1,9 @@
 import time
 
+from openai import OpenAI
 from openai.types import FileObject
 from openai.types.beta import VectorStore
 from openai.types.beta.vector_stores import VectorStoreFile
-
-from paper_supporter.prerude import CLIENT
 
 
 class FileManager:
@@ -12,53 +11,55 @@ class FileManager:
     OpenAIのサーバーで管理されているファイルを操作するためのクラス
     """
 
-    def __init__(self, vector_store_id=None):
+    def __init__(self, client: OpenAI, vector_store_id=None):
+        self.client = client
+
         if vector_store_id is None:
-            self.vector_store: VectorStore = CLIENT.beta.vector_stores.create()
+            self.vector_store: VectorStore = self.client.beta.vector_stores.create()
         else:
-            existing_vector_store = next((x for x in CLIENT.beta.vector_stores.list() if x.id == vector_store_id), None)
+            existing_vector_store = next(
+                (x for x in self.client.beta.vector_stores.list() if x.id == vector_store_id),
+                None
+            )
             if existing_vector_store:
                 self.vector_store: VectorStore = existing_vector_store
             else:
                 print(f"Vector store with ID {vector_store_id} not found. Creating a new vector store.")
-                self.vector_store: VectorStore = CLIENT.beta.vector_stores.create()
+                self.vector_store: VectorStore = self.client.beta.vector_stores.create()
 
-    @staticmethod
-    def upload_file(file_object) -> FileObject:
+    def upload_file(self, file_object) -> FileObject:
         """
         ファイルをアップロードする
         """
-        return CLIENT.files.create(
+        return self.client.files.create(
             file=file_object,
             purpose="assistants",
         )
 
-    @staticmethod
-    def get_files() -> list[FileObject]:
+    def get_files(self) -> list[FileObject]:
         """
         アップロードされているファイルの一覧を取得する
         """
-        return [x for x in CLIENT.files.list()]
+        return [x for x in self.client.files.list()]
 
-    @staticmethod
-    def remove_file(file: FileObject) -> bool:
+    def remove_file(self, file: FileObject) -> bool:
         """
         アップロードされているファイルを消去する
         """
-        return CLIENT.files.delete(file.id).deleted
+        return self.client.files.delete(file.id).deleted
 
     def attach_file(self, file: FileObject) -> VectorStoreFile | None:
         """
         アップロードされているファイルをVector Storeにアタッチする
         """
-        attached_file = CLIENT.beta.vector_stores.files.create(
+        attached_file = self.client.beta.vector_stores.files.create(
             vector_store_id=self.vector_store.id,
             file_id=file.id
         )
         while attached_file.status == "in_progress":
             print(attached_file.status)
             time.sleep(1)
-            attached_file: VectorStoreFile = CLIENT.beta.vector_stores.files.retrieve(
+            attached_file: VectorStoreFile = self.client.beta.vector_stores.files.retrieve(
                 vector_store_id=self.vector_store.id,
                 file_id=file.id
             )
@@ -85,7 +86,7 @@ class FileManager:
             print("File is not attached to the vector store.")
             return None
 
-        res = CLIENT.beta.vector_stores.files.delete(
+        res = self.client.beta.vector_stores.files.delete(
             vector_store_id=self.vector_store.id,
             file_id=vector_store_file.id
         )
@@ -93,14 +94,14 @@ class FileManager:
             print("Failed to detach file.")
             return None
 
-        vector_store_file = CLIENT.beta.vector_stores.files.retrieve(
+        vector_store_file = self.client.beta.vector_stores.files.retrieve(
             vector_store_id=self.vector_store.id,
             file_id=vector_store_file.id
         )
         while vector_store_file.status == "in_progress":
             print(vector_store_file.status)
             time.sleep(1)
-            vector_store_file = CLIENT.beta.vector_stores.files.retrieve(
+            vector_store_file = self.client.beta.vector_stores.files.retrieve(
                 vector_store_id=self.vector_store.id,
                 file_id=vector_store_file.id
             )
@@ -121,4 +122,4 @@ class FileManager:
         """
         Vector Storeにアタッチされているファイルの一覧を取得する
         """
-        return [x for x in CLIENT.beta.vector_stores.files.list(self.vector_store.id)]
+        return [x for x in self.client.beta.vector_stores.files.list(self.vector_store.id)]

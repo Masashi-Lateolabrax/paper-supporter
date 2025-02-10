@@ -3,11 +3,9 @@ import sys
 from PySide6.QtGui import QDragEnterEvent, QDropEvent
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QFileDialog, QApplication
 
-from paper_supporter.lib.openai.file_manager import FileManager
-
 from concurrent.futures import ThreadPoolExecutor
 
-from paper_supporter.prerude import ASSISTANT_VECTOR_STORE_ID
+from paper_supporter.lib.openai.file_manager import FileManager
 
 from vector_store_manager import VectorStoreManager
 from storage_manager import StorageManager
