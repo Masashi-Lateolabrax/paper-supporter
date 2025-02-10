@@ -1,0 +1,8 @@
+# This file is ".env" file template.
+# Please put ".env" file in the same directory as "main.py".
+# ASSISTANT_VECTOR_STORE_ID is optional.
+
+ORGANIZATION = "$(YOUR ORGANAIZATION CODE)"
+PROJECT = "$(YOUR PROJECT CODE)"
+OPENAI_API_KEY = "$(YOUR APIKEY)"
+ASSISTANT_VECTOR_STORE_ID = ""
