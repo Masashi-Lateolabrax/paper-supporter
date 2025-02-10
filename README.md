@@ -57,6 +57,10 @@ def functionB_v5():
 
 # Update History
 
+## 0.0.5
+
+- requirements.txtを作成しました
+
 ## 0.0.4
 
 - 基本的な機能を実装しました
