@@ -81,6 +81,10 @@ def functionB_v5():
 
 # Update History
 
+## 1.0.0
+
+- mainブランチにマージしました
+
 ## 0.0.6
 
 - READMEにこのプロジェクトの使用方法を追加しました
